@@ -1,0 +1,44 @@
+erDiagram
+    USERS {
+        int id PK
+        varchar username UK
+        varchar password
+        varchar email UK
+        timestamp created_at
+    }
+    
+    CHATS {
+        int id PK
+        varchar chat_type
+        varchar name UK
+        text description
+        timestamp created_at
+    }
+    
+    CHAT_PARTICIPANTS {
+        int id PK
+        timestamp joined_at
+        varchar role
+        int user_id FK
+        int chat_id FK
+    }
+    
+    MESSAGES {
+        int id PK
+        text content
+        varchar content_type
+        text attachment_link
+        bytea file_data
+        varchar file_name
+        varchar file_type
+        timestamp timestamp
+        boolean pinned
+        boolean anonymous
+        int chat_id FK
+        int sender_id FK
+    }
+    
+    USERS ||--o{ CHAT_PARTICIPANTS : "participates in"
+    CHATS ||--o{ CHAT_PARTICIPANTS : "has"
+    USERS ||--o{ MESSAGES : "sends"
+    CHATS ||--o{ MESSAGES : "contains"

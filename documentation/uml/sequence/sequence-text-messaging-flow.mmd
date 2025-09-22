@@ -1,0 +1,55 @@
+sequenceDiagram
+    %% Participants
+    participant ClientUI as Client UI
+    participant ChatController as Chat Controller
+    participant WebSocketSvc as WebSocketService
+    participant WebSocketHandler as WebSocketHandler
+    participant MsgProcessor as WebSocketMessageProcessor
+    participant StompSession as STOMP Session
+    participant ClientDB as Client Database
+    participant MessageDAO as Message DAO
+    participant ServerEndpoint as Server WebSocket Endpoint
+    participant ServerController as Message Controller
+    participant SessionService as Chat Session Service
+
+    %% Sending a Text Message
+    ClientUI->>ChatController: sendMessage()
+    ChatController->>MessageDAO: create(message)
+    MessageDAO->>ClientDB: INSERT INTO messages
+    ClientDB-->>MessageDAO: message.id
+    MessageDAO-->>ChatController: savedMessage
+    
+    ChatController->>WebSocketSvc: sendMessage(savedMessage)
+    WebSocketSvc->>WebSocketHandler: sendMessage(savedMessage)
+    WebSocketHandler->>MsgProcessor: sendMessage(savedMessage)
+    
+    MsgProcessor->>MsgProcessor: Create WebSocketMessageDTO
+    MsgProcessor->>StompSession: send(chatTopic + "/message", messageDTO)
+    StompSession->>ServerEndpoint: /app/chat/{chatId}/message
+    
+    ServerEndpoint->>ServerController: sendChatMessage(chatId, message)
+    ServerController->>ServerController: validateMessage(message, chatId, true)
+    Note over ServerController: Check if user is a participant<br/>in session registry
+    
+    alt Valid Message
+        ServerController->>SessionService: getUsersInChat(chatId)
+        ServerController->>ServerEndpoint: send to /topic/chat/{chatId}/message
+        
+        %% Message broadcast to all subscribers (including sender)
+        ServerEndpoint-->>StompSession: broadcast message
+        StompSession-->>MsgProcessor: handleFrame(frame)
+        MsgProcessor->>MsgProcessor: processChatMessage(dto)
+        MsgProcessor->>WebSocketHandler: notifyMessageReceived(message)
+        WebSocketHandler->>WebSocketSvc: onMessageReceived(message)
+        WebSocketSvc->>ChatController: notify message listeners
+        ChatController->>ClientUI: update UI with new message
+    else Invalid Message
+        ServerController->>ServerController: Create error message
+        ServerController->>ServerEndpoint: return error message
+        ServerEndpoint-->>StompSession: send error
+        StompSession-->>MsgProcessor: handleFrame(error)
+        MsgProcessor->>WebSocketHandler: notifyError(errorMessage)
+        WebSocketHandler->>WebSocketSvc: onError(errorMessage)
+        WebSocketSvc->>ChatController: notify error listeners
+        ChatController->>ClientUI: display error
+    end

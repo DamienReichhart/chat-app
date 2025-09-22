@@ -1,0 +1,64 @@
+sequenceDiagram
+    %% Participants
+    participant ClientUI as Client UI
+    participant AuthController as Auth Controller
+    participant SessionSvc as SessionService
+    participant WebSocketSvc as WebSocketService
+    participant WebSocketHandler as WebSocketHandler
+    participant ConnManager as WebSocketConnectionManager
+    participant StompClient as STOMP Client
+    participant ClientDB as Client Database
+    participant UserDAO as User DAO
+    participant ServerEndpoint as Server WebSocket Endpoint
+    participant ServerController as Server Controller
+
+    %% Connection Flow
+    ClientUI->>AuthController: login(username, password)
+    AuthController->>UserDAO: getUserByCredentials(username, password)
+    UserDAO->>ClientDB: SELECT * FROM users
+    ClientDB-->>UserDAO: userData
+    UserDAO-->>AuthController: authenticatedUser
+    
+    alt Authentication Success
+        AuthController->>SessionSvc: setCurrentUser(authenticatedUser)
+        SessionSvc->>AuthController: sessionStarted
+        AuthController->>WebSocketSvc: connect(authenticatedUser)
+        WebSocketSvc->>WebSocketSvc: this.currentUser = user
+        WebSocketSvc->>WebSocketHandler: connect(user)
+        WebSocketHandler->>ConnManager: connect(user)
+        ConnManager->>ConnManager: this.currentUser = user
+        ConnManager->>ConnManager: createWebSocketClient()
+        ConnManager->>StompClient: connect()
+        StompClient->>ServerEndpoint: WebSocket connection request
+        
+        %% Async Connection Handling
+        ServerEndpoint-->>StompClient: connection established
+        StompClient-->>ConnManager: stompSession created
+        ConnManager->>WebSocketHandler: handleSuccessfulConnection(session)
+        WebSocketHandler->>WebSocketSvc: onConnectionStatusChanged(true)
+        WebSocketSvc->>WebSocketSvc: processPendingJoins()
+        
+        Note over WebSocketSvc: Process any chats<br/>waiting to be joined
+        
+        WebSocketSvc->>AuthController: notify connection listeners
+        AuthController->>ClientUI: update UI (connected)
+        
+        %% Load user data from local database
+        AuthController->>SessionSvc: loadUserData()
+        SessionSvc->>UserDAO: getUserChats(userId)
+        UserDAO->>ClientDB: SELECT * FROM chat_participants WHERE user_id = ?
+        ClientDB-->>UserDAO: chatParticipantData
+        UserDAO-->>SessionSvc: userChats
+        SessionSvc-->>AuthController: userData loaded
+        AuthController->>ClientUI: navigate to main view
+    else Authentication Failure
+        AuthController->>ClientUI: show error message
+    end
+    
+    %% Error Handling Path (Alternative Flow)
+    ServerEndpoint--xStompClient: connection error
+    StompClient--xConnManager: connection error
+    ConnManager->>WebSocketHandler: handleTransportError(session, exception)
+    WebSocketHandler->>WebSocketSvc: onError(errorMessage)
+    WebSocketSvc->>AuthController: notify error listeners
+    AuthController->>ClientUI: show connection error

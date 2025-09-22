@@ -1,0 +1,362 @@
+/* Main Application Stylesheet
+   A modern, professional theme for the chat client application
+   Follows a clean, material design inspired approach
+*/
+
+/* ---------- Color Variables ---------- */
+* {
+    -fx-primary: #3498db;        /* Primary color - blue */
+    -fx-primary-dark: #2980b9;   /* Darker shade of primary */
+    -fx-primary-light: #e1f0fa;  /* Lighter shade of primary */
+    
+    -fx-secondary: #2ecc71;      /* Secondary color - green */
+    -fx-secondary-dark: #27ae60; /* Darker shade of secondary */
+    
+    -fx-accent: #9b59b6;         /* Accent color - purple */
+    
+    -fx-background: #f8f9fa;     /* Light background color */
+    -fx-background-dark: #e9ecef; /* Slightly darker background */
+    
+    -fx-text: #212529;           /* Main text color - almost black */
+    -fx-text-light: #6c757d;     /* Secondary text color - gray */
+    -fx-text-white: #ffffff;     /* White text for dark backgrounds */
+    
+    -fx-danger: #e74c3c;         /* Error/danger color - red */
+    -fx-warning: #f39c12;        /* Warning color - orange/amber */
+    -fx-success: #2ecc71;        /* Success color - green */
+    -fx-info: #3498db;           /* Info color - blue */
+    
+    /* Shadow properties */
+    -fx-shadow-depth-1: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 5, 0, 0, 1);
+    -fx-shadow-depth-2: dropshadow(gaussian, rgba(0, 0, 0, 0.15), 10, 0, 0, 2);
+    -fx-shadow-depth-3: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 15, 0, 0, 3);
+    
+    /* Font properties */
+    -fx-font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    -fx-font-size: 13px;
+}
+
+/* ---------- Root & Scene ---------- */
+.root {
+    -fx-background-color: -fx-background;
+    -fx-font-family: -fx-font-family;
+    -fx-font-size: 13px;
+    -fx-text-fill: -fx-text;
+}
+
+/* ---------- Buttons ---------- */
+.button {
+    -fx-background-color: -fx-primary;
+    -fx-text-fill: -fx-text-white;
+    -fx-padding: 8px 16px;
+    -fx-background-radius: 4px;
+    -fx-cursor: hand;
+    -fx-effect: -fx-shadow-depth-1;
+    -fx-font-weight: bold;
+}
+
+.button:hover {
+    -fx-background-color: -fx-primary-dark;
+}
+
+.button:pressed {
+    -fx-background-color: derive(-fx-primary-dark, -10%);
+    -fx-effect: -fx-shadow-depth-1;
+}
+
+.button-secondary {
+    -fx-background-color: -fx-secondary;
+}
+
+.button-secondary:hover {
+    -fx-background-color: -fx-secondary-dark;
+}
+
+.button-secondary:pressed {
+    -fx-background-color: derive(-fx-secondary-dark, -10%);
+}
+
+.button-flat {
+    -fx-background-color: transparent;
+    -fx-text-fill: -fx-primary;
+    -fx-effect: null;
+}
+
+.button-flat:hover {
+    -fx-background-color: rgba(52, 152, 219, 0.1);
+}
+
+.button-danger {
+    -fx-background-color: -fx-danger;
+}
+
+.button-danger:hover {
+    -fx-background-color: derive(-fx-danger, -10%);
+}
+
+.button-icon {
+    -fx-background-color: transparent;
+    -fx-padding: 6px;
+    -fx-background-radius: 50%;
+    -fx-effect: null;
+}
+
+.button-icon:hover {
+    -fx-background-color: rgba(108, 117, 125, 0.1);
+}
+
+/* ---------- Text Fields & Areas ---------- */
+.text-field, .text-area {
+    -fx-background-color: white;
+    -fx-border-color: #ced4da;
+    -fx-border-radius: 4px;
+    -fx-padding: 8px;
+}
+
+.text-field:focused, .text-area:focused {
+    -fx-border-color: -fx-primary;
+    -fx-effect: -fx-shadow-depth-1;
+}
+
+.text-area .content {
+    -fx-background-color: white;
+    -fx-padding: 0;
+}
+
+/* ---------- Labels ---------- */
+.label {
+    -fx-text-fill: -fx-text;
+}
+
+.label-header {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+}
+
+.label-subheader {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+}
+
+.label-light {
+    -fx-text-fill: -fx-text-light;
+}
+
+.label-white {
+    -fx-text-fill: -fx-text-white;
+}
+
+/* ---------- List Views ---------- */
+.list-view {
+    -fx-background-color: white;
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+    -fx-border-color: #ced4da;
+    -fx-border-radius: 4px;
+}
+
+.list-view .list-cell {
+    -fx-background-color: white;
+    -fx-padding: 10px;
+    -fx-border-color: transparent transparent #f0f0f0 transparent;
+}
+
+.list-view .list-cell:hover {
+    -fx-background-color: -fx-background;
+}
+
+.list-view .list-cell:selected {
+    -fx-background-color: -fx-primary-light;
+    -fx-text-fill: -fx-text;
+}
+
+/* ---------- Chat Components ---------- */
+.chat-list {
+    -fx-background-color: white;
+}
+
+.message-bubble-sent {
+    -fx-background-color: -fx-primary-light;
+    -fx-background-radius: 15px 0px 15px 15px;
+    -fx-padding: 10px;
+}
+
+.message-bubble-received {
+    -fx-background-color: white;
+    -fx-background-radius: 0px 15px 15px 15px;
+    -fx-border-color: #e0e0e0;
+    -fx-border-radius: 0px 15px 15px 15px;
+    -fx-border-width: 1px;
+    -fx-padding: 10px;
+    -fx-effect: -fx-shadow-depth-1;
+}
+
+.chat-input {
+    -fx-background-color: white;
+    -fx-border-color: #ced4da;
+    -fx-border-radius: 20px;
+    -fx-padding: 10px 15px;
+}
+
+.chat-header {
+    -fx-background-color: -fx-primary;
+    -fx-padding: 10px;
+    -fx-effect: -fx-shadow-depth-2;
+}
+
+/* ---------- Sidebar ---------- */
+.sidebar {
+    -fx-background-color: -fx-background-dark;
+    -fx-effect: -fx-shadow-depth-2;
+}
+
+.sidebar-header {
+    -fx-background-color: -fx-primary;
+    -fx-padding: 15px;
+}
+
+.sidebar-item {
+    -fx-padding: 10px 15px;
+    -fx-cursor: hand;
+}
+
+.sidebar-item:hover {
+    -fx-background-color: rgba(52, 152, 219, 0.1);
+}
+
+.sidebar-item-selected {
+    -fx-background-color: -fx-primary-light;
+    -fx-border-color: -fx-primary transparent transparent transparent;
+    -fx-border-width: 3px 0px 0px 0px;
+}
+
+/* ---------- Scrollbars ---------- */
+.scroll-bar {
+    -fx-background-color: transparent;
+    -fx-pref-width: 10px;
+}
+
+.scroll-bar .thumb {
+    -fx-background-color: #cccccc;
+    -fx-background-radius: 5px;
+}
+
+.scroll-bar .thumb:hover, .scroll-bar .thumb:pressed {
+    -fx-background-color: #a0a0a0;
+}
+
+.scroll-bar .increment-button, .scroll-bar .decrement-button,
+.scroll-bar .increment-arrow, .scroll-bar .decrement-arrow {
+    -fx-padding: 0;
+    -fx-shape: "";
+    -fx-background-color: transparent;
+}
+
+/* ---------- Misc Components ---------- */
+.separator {
+    -fx-background-color: #e0e0e0;
+    -fx-opacity: 0.8;
+}
+
+.progress-bar .bar {
+    -fx-background-color: -fx-primary;
+}
+
+.spinner .increment-arrow-button, .spinner .decrement-arrow-button {
+    -fx-background-color: -fx-primary;
+}
+
+.check-box .box {
+    -fx-background-color: white;
+    -fx-border-color: #ced4da;
+    -fx-border-radius: 3px;
+}
+
+.check-box:selected .mark {
+    -fx-background-color: -fx-text-white;
+}
+
+.check-box:selected .box {
+    -fx-background-color: -fx-primary;
+    -fx-border-color: -fx-primary;
+}
+
+.radio-button .radio {
+    -fx-background-color: white;
+    -fx-border-color: #ced4da;
+    -fx-border-radius: 50%;
+}
+
+.radio-button:selected .dot {
+    -fx-background-color: -fx-text-white;
+}
+
+.radio-button:selected .radio {
+    -fx-background-color: -fx-primary;
+    -fx-border-color: -fx-primary;
+}
+
+/* ---------- Alerts and Notifications ---------- */
+.alert {
+    -fx-background-color: white;
+    -fx-effect: -fx-shadow-depth-3;
+}
+
+.dialog-pane {
+    -fx-background-color: -fx-background;
+}
+
+.dialog-pane .header-panel {
+    -fx-background-color: -fx-primary;
+}
+
+.dialog-pane .header-panel .label {
+    -fx-text-fill: -fx-text-white;
+    -fx-font-weight: bold;
+}
+
+.dialog-pane .button-bar .button {
+    -fx-background-color: -fx-primary;
+    -fx-text-fill: -fx-text-white;
+}
+
+/* ---------- Dark Theme Support ---------- */
+.theme-dark {
+    -fx-background: #121212;
+    -fx-background-dark: #1e1e1e;
+    -fx-text: #e0e0e0;
+    -fx-text-light: #9e9e9e;
+}
+
+.theme-dark .root {
+    -fx-background-color: -fx-background;
+    -fx-text-fill: -fx-text;
+}
+
+.theme-dark .list-view,
+.theme-dark .text-field,
+.theme-dark .text-area {
+    -fx-background-color: #1e1e1e;
+    -fx-border-color: #333333;
+    -fx-text-fill: -fx-text;
+}
+
+.theme-dark .text-area .content {
+    -fx-background-color: #1e1e1e;
+}
+
+.theme-dark .list-view .list-cell {
+    -fx-background-color: #1e1e1e;
+    -fx-text-fill: -fx-text;
+    -fx-border-color: transparent transparent #333333 transparent;
+}
+
+.theme-dark .list-view .list-cell:hover {
+    -fx-background-color: #252525;
+}
+
+.theme-dark .list-view .list-cell:selected {
+    -fx-background-color: #2a3950;
+}
+
+/* Apply theme dark to all other components as needed */ 

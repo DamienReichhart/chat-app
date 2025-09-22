@@ -1,0 +1,244 @@
+image: ubuntu:22.04
+
+before_script:
+  - apt-get update -y
+  - apt-get install -y wget openjdk-21-jdk
+  # Install specific Maven version
+  - wget https://archive.apache.org/dist/maven/maven-3/3.9.6/binaries/apache-maven-3.9.6-bin.tar.gz -P /tmp
+  - tar xf /tmp/apache-maven-3.9.6-bin.tar.gz -C /opt
+  - ln -s /opt/apache-maven-3.9.6/bin/mvn /usr/bin/mvn
+  # Set JAVA_HOME and add to PATH
+  - export JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
+  - export PATH=$JAVA_HOME/bin:$PATH
+
+variables:
+  MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=WARN -Dorg.slf4j.simpleLogger.showDateTime=true -Djava.awt.headless=true"
+  MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end --show-version"
+  DOCKER_DRIVER: overlay2
+  DOCKER_TLS_CERTDIR: ""
+  # Skip interactive prompt during package installation
+  DEBIAN_FRONTEND: noninteractive
+
+# Cache Maven dependencies between jobs
+cache:
+  paths:
+    - .m2/repository/
+    - "*/target/"
+  key: ${CI_COMMIT_REF_SLUG}
+  policy: pull-push
+
+stages:
+  - validate
+  - test
+  - build
+  - package
+  - deploy
+
+# Validate the project's structure and dependencies
+validate:
+  stage: validate
+  script:
+    - mvn $MAVEN_CLI_OPTS validate
+  only:
+    - main
+    - dev
+    - merge_requests
+
+# Compile the source code
+compile:
+  stage: validate
+  script:
+    - mvn $MAVEN_CLI_OPTS clean compile package install -DskipTests
+  artifacts:
+    paths:
+      - "*/target/classes/"
+      - "*/target/*.jar"
+    expire_in: 1 hour
+  only:
+    - main
+    - dev
+    - merge_requests
+
+# Run tests on common module
+test:common:
+  stage: test
+  needs: [compile]
+  script:
+    - mvn $MAVEN_CLI_OPTS -pl chat-common test
+  artifacts:
+    reports:
+      junit: chat-common/target/surefire-reports/TEST-*.xml
+    paths:
+      - chat-common/target/site/jacoco/
+      - chat-common/target/*.jar
+    expire_in: 1 week
+  only:
+    - main
+    - dev
+    - merge_requests
+
+# Run tests on client module
+test:client:
+  stage: test
+  needs: [compile, test:common]
+  script:
+    - mvn $MAVEN_CLI_OPTS -pl chat-client test
+  artifacts:
+    reports:
+      junit: chat-client/target/surefire-reports/TEST-*.xml
+    paths:
+      - chat-client/target/site/jacoco/
+    expire_in: 1 week
+  only:
+    - main
+    - dev
+    - merge_requests
+
+
+# Run tests on server module
+test:server:
+  stage: test
+  needs: [compile, test:common]
+  script:
+    - mvn $MAVEN_CLI_OPTS -pl chat-server test
+  artifacts:
+    reports:
+      junit: chat-server/target/surefire-reports/TEST-*.xml
+    paths:
+      - chat-server/target/site/jacoco/
+    expire_in: 1 week
+  only:
+    - main
+    - dev
+    - merge_requests
+
+# Code coverage report for all modules
+code_coverage:
+  stage: test
+  needs: [test:common, test:client, test:server]
+  script:
+    - mvn $MAVEN_CLI_OPTS jacoco:report jacoco:report-aggregate
+  artifacts:
+    paths:
+      - target/site/jacoco-aggregate/
+    expire_in: 1 week
+  only:
+    - main
+    - dev
+    - merge_requests
+
+# Build all modules
+build:
+  stage: build
+  needs: [test:common, test:client, test:server]
+  script:
+    - mvn $MAVEN_CLI_OPTS package -DskipTests
+  artifacts:
+    paths:
+      - chat-common/target/*.jar
+      - chat-client/target/*.jar
+      - chat-server/target/*.jar
+    expire_in: 1 week
+  only:
+    - tags
+    - main
+    - dev
+
+# Package client for Linux - using Docker
+package:linux:
+  stage: package
+  needs: [build]
+  image: docker:24.0
+  services:
+    - docker:24.0-dind
+  before_script:
+    - docker info
+  script:
+    - docker build -t jpackage-linux -f docker/buildLinux.dockerfile .
+    - docker run -v $(pwd):/app jpackage-linux make jpackage-linux-client
+  artifacts:
+    paths:
+      - chat-client/build/*.deb
+      - chat-client/build/*.rpm
+    expire_in: 1 month
+  only:
+    - tags
+    - main
+
+# Package client for Windows - using Windows Runner
+package:windows:
+  stage: package
+  needs: [build]
+  tags:
+    - windows
+  variables:
+    JAVA_HOME: "C:\\Program Files\\Java\\jdk-21"
+    MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
+  before_script:
+    # Ensure necessary tools are available - these should be pre-installed on the runner
+    - if (-not (Test-Path "$env:JAVA_HOME")) { throw "Java JDK not found at $env:JAVA_HOME" }
+    - if (-not (Get-Command mvn -ErrorAction SilentlyContinue)) { throw "Maven not found in PATH" }
+    - Write-Host "Using Java version:"
+    - java -version
+    - Write-Host "Using Maven version:"
+    - mvn -version
+  script:
+    # Build and package using Maven and jpackage
+    - mvn clean package install -DskipTests
+    - cd chat-client
+    - mkdir -p build
+    # Create EXE installer
+    - jpackage --name AP4 --input target --main-jar chat-client-1.0-SNAPSHOT.jar --main-class com.ap4.client.Bootstrap --type exe --dest build --java-options "-Xmx2048m" --icon src/main/resources/logo.ico --vendor "REICHHART Damien"
+    # Create MSI installer
+    - jpackage --name AP4 --input target --main-jar chat-client-1.0-SNAPSHOT.jar --main-class com.ap4.client.Bootstrap --type msi --dest build --java-options "-Xmx2048m" --icon src/main/resources/logo.ico --vendor "REICHHART Damien"
+    - cd ..
+  artifacts:
+    paths:
+      - chat-client/build/*.exe
+      - chat-client/build/*.msi
+    expire_in: 1 month
+  only:
+    - nobranch # skip cause no available windows runner
+
+# Deploy client packages to GitLab package registry
+deploy:package:
+  stage: deploy
+  needs: [package:linux] #[package:linux, package:windows]
+  image: curlimages/curl:latest
+  before_script: [] # Override the global before_script since this image doesn't have apt-get
+  script:
+    - |
+      for package in chat-client/build/*.deb; do
+        curl --header "JOB-TOKEN: $CI_JOB_TOKEN" --upload-file "$package" "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/ap4-chat-client/${CI_COMMIT_TAG:-latest}/$(basename $package)"
+      done
+    - |
+      for package in chat-client/build/*.rpm; do
+        curl --header "JOB-TOKEN: $CI_JOB_TOKEN" --upload-file "$package" "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/ap4-chat-client/${CI_COMMIT_TAG:-latest}/$(basename $package)"
+      done
+    #- |
+    #  for package in chat-client/build/*.exe; do
+    #    curl --header "JOB-TOKEN: $CI_JOB_TOKEN" --upload-file "$package" "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/ap4-chat-client/${CI_COMMIT_TAG:-latest}/$(basename $package)"
+    #  done
+    #- |
+    #  for package in chat-client/build/*.msi; do
+    #    curl --header "JOB-TOKEN: $CI_JOB_TOKEN" --upload-file "$package" "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/ap4-chat-client/${CI_COMMIT_TAG:-latest}/$(basename $package)"
+    #  done
+  only:
+    - tags
+    - main
+
+# Security scanning using OWASP Dependency Check
+dependency_scanning:
+  stage: test
+  script:
+    - mvn $MAVEN_CLI_OPTS org.owasp:dependency-check-maven:check
+  artifacts:
+    paths:
+      - "*/target/dependency-check-report.html"
+    expire_in: 1 week
+  allow_failure: true
+  only:
+    - main
+    - dev
+
+

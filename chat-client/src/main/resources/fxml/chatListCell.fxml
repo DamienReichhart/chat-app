@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.Circle?>
+<?import javafx.geometry.*?>
+
+<HBox xmlns:fx="http://javafx.com/fxml" fx:controller="com.ap4.client.controllers.ChatListCellController"
+      styleClass="chat-list-cell"
+      alignment="CENTER_LEFT"
+      fx:id="mainBox"
+      spacing="12">
+
+    <!-- Avatar container with status indicator -->
+    <StackPane minWidth="42" minHeight="42">
+        <Circle fx:id="avatarCircle" styleClass="avatar" radius="20" />
+        <Label fx:id="avatarText" styleClass="avatar-text" />
+        <!-- Online status indicator -->
+        <Circle fx:id="statusIndicator" styleClass="status-indicator" radius="5" 
+                StackPane.alignment="BOTTOM_RIGHT">
+            <StackPane.margin>
+                <Insets right="-2" bottom="-2" />
+            </StackPane.margin>
+        </Circle>
+    </StackPane>
+
+    <!-- Chat name and message preview -->
+    <VBox fx:id="textContainer" spacing="3" HBox.hgrow="ALWAYS">
+        <HBox alignment="CENTER_LEFT">
+            <Label fx:id="titleLabel" styleClass="chat-name" maxWidth="180" />
+            <Region HBox.hgrow="ALWAYS" />
+            <Label fx:id="timeLabel" styleClass="time" />
+        </HBox>
+        <HBox alignment="CENTER_LEFT" spacing="5">
+            <Label fx:id="messageLabel" styleClass="last-message" maxWidth="180" HBox.hgrow="ALWAYS" />
+            <Region HBox.hgrow="ALWAYS" />
+            <Label fx:id="unreadCountLabel" styleClass="unread-count" text="" />
+        </HBox>
+    </VBox>
+
+    <padding>
+        <Insets top="8" right="16" bottom="8" left="16" />
+    </padding>
+</HBox>

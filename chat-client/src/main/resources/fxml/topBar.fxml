@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.shape.SVGPath?>
+<?import javafx.scene.shape.Circle?>
+
+<HBox alignment="CENTER_LEFT" styleClass="chat-header" xmlns="http://javafx.com/javafx/21.0.2" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ap4.client.controllers.TopBarController">
+
+   <!-- Avatar placeholder with first letter -->
+   <StackPane styleClass="avatar-container">
+      <Circle radius="20" styleClass="avatar" fill="#5b6e80" />
+      <Label fx:id="avatarLabel" text="T" styleClass="avatar-text" />
+   </StackPane>
+
+   <!-- Chat title and status -->
+   <VBox styleClass="chat-title-container" HBox.hgrow="ALWAYS">
+      <Label fx:id="titleLabel" styleClass="title" text="Chat Name" />
+      <Label fx:id="statusLabel" styleClass="subtitle" text="last seen recently" />
+   </VBox>
+
+   <!-- Action buttons -->
+   <Button styleClass="icon-button" fx:id="searchButton" onAction="#handleSearchButton">
+      <graphic>
+         <SVGPath content="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" 
+                  fill="#707579" />
+      </graphic>
+   </Button>
+
+   <Button styleClass="icon-button" fx:id="menuOptionsButton" onAction="#handleMenuOptionsButton">
+      <graphic>
+         <SVGPath content="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" 
+                  fill="#707579" />
+      </graphic>
+   </Button>
+
+   <Button styleClass="icon-button" fx:id="logoutButton" onAction="#handleLogoutButton">
+      <graphic>
+         <SVGPath content="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z" 
+                  fill="#707579" />
+      </graphic>
+   </Button>
+
+</HBox>

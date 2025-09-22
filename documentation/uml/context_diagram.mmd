@@ -1,0 +1,24 @@
+graph TB
+    subgraph "Acteurs Principaux"
+        User[Utilisateur standard]
+        Admin[Administrateur]
+    end
+    
+    subgraph "Système de Chat AP4"
+        Client[Client de Chat]
+        Server[Serveur de Chat]
+        DB[(Base de données PostgreSQL)]
+    end
+    
+    User --> Client
+    Admin --> Client
+    
+    Client <--> Server
+    Client <--> DB
+    
+    style User fill:#f9f,stroke:#333,stroke-width:2px
+    style Admin fill:#f9f,stroke:#333,stroke-width:2px
+    style Client fill:#bbf,stroke:#333,stroke-width:2px
+    style Server fill:#bbf,stroke:#333,stroke-width:2px
+    style DB fill:#bfb,stroke:#333,stroke-width:2px
+

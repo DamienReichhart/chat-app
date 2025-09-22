@@ -1,0 +1,75 @@
+sequenceDiagram
+    %% Participants
+    participant ClientUI as Client UI
+    participant ChatController as Chat Controller
+    participant FileService as File Service
+    participant WebSocketSvc as WebSocketService
+    participant WebSocketHandler as WebSocketHandler
+    participant MsgProcessor as WebSocketMessageProcessor
+    participant StompSession as STOMP Session
+    participant ClientDB as Client Database
+    participant MessageDAO as Message DAO
+    participant ServerEndpoint as Server WebSocket Endpoint
+    participant MsgController as Message Controller
+    participant SessionService as Chat Session Service
+
+    %% File Sharing Flow
+    ClientUI->>ChatController: selectFile()
+    ChatController->>FileService: readFile(selectedFile)
+    FileService-->>ChatController: fileData, fileType, fileName
+    
+    %% Create file message and save to local database
+    ChatController->>ChatController: Create Message with ContentType.FILE/IMAGE
+    ChatController->>MessageDAO: create(fileMessage)
+    MessageDAO->>ClientDB: INSERT INTO messages (including file_data)
+    ClientDB-->>MessageDAO: message.id
+    MessageDAO-->>ChatController: savedFileMessage
+    
+    %% Create message copy without file data for network transmission
+    ChatController->>ChatController: Create copy of message without fileData
+    
+    %% Send to other clients via server
+    ChatController->>WebSocketSvc: sendMessage(messageCopyWithoutFileData)
+    WebSocketSvc->>WebSocketHandler: sendMessage(messageCopyWithoutFileData)
+    WebSocketHandler->>MsgProcessor: sendMessage(messageCopyWithoutFileData)
+    
+    MsgProcessor->>MsgProcessor: Create WebSocketMessageDTO
+    MsgProcessor->>StompSession: send(chatTopic + "/message", messageDTO)
+    StompSession->>ServerEndpoint: /app/chat/{chatId}/message
+    
+    ServerEndpoint->>MsgController: sendChatMessage(chatId, messageDTO)
+    MsgController->>MsgController: validateMessage(messageDTO, chatId, true)
+    MsgController->>SessionService: getUsersInChat(chatId)
+    
+    alt Valid File Message
+        MsgController->>ServerEndpoint: send to /topic/chat/{chatId}/message
+        
+        %% File message broadcast (with metadata only)
+        ServerEndpoint-->>StompSession: broadcast message to other clients
+        StompSession-->>MsgProcessor: handleFrame(frame)
+        MsgProcessor->>MsgProcessor: processChatMessage(dto)
+        
+        %% Other clients save file message to their local database 
+        %% (without file data initially)
+        MsgProcessor->>WebSocketHandler: notifyMessageReceived(fileMessage)
+        WebSocketHandler->>WebSocketSvc: onMessageReceived(fileMessage)
+        WebSocketSvc->>ChatController: notify message listeners
+        
+        alt Other Client Receivers
+            ChatController->>MessageDAO: create(fileMessage) - metadata only
+            MessageDAO->>ClientDB: INSERT INTO messages (without file_data)
+            ClientDB-->>MessageDAO: message.id
+            MessageDAO-->>ChatController: success
+        end
+        
+        ChatController->>ClientUI: update UI with file message indicator
+    else Invalid File Message
+        MsgController->>MsgController: Create error response
+        MsgController->>ServerEndpoint: return error message
+        ServerEndpoint-->>StompSession: send error
+        StompSession-->>MsgProcessor: handleFrame(error)
+        MsgProcessor->>WebSocketHandler: notifyError(errorMessage)
+        WebSocketHandler->>WebSocketSvc: onError(errorMessage)
+        WebSocketSvc->>ChatController: notify error listeners
+        ChatController->>ClientUI: display error
+    end

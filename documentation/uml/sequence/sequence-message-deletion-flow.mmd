@@ -1,0 +1,67 @@
+sequenceDiagram
+    %% Participants
+    participant ClientUI as Client UI
+    participant ChatController as Chat Controller
+    participant WebSocketSvc as WebSocketService
+    participant WebSocketHandler as WebSocketHandler
+    participant MsgProcessor as WebSocketMessageProcessor
+    participant StompSession as STOMP Session
+    participant ClientDB as Client Database
+    participant MessageDAO as Message DAO
+    participant ServerEndpoint as Server WebSocket Endpoint
+    participant MessageMgmtCtrl as Message Management Controller
+    participant SessionService as Chat Session Service
+
+    %% Delete Message Flow
+    ClientUI->>ChatController: deleteMessage(message)
+    
+    %% Update local database first
+    ChatController->>MessageDAO: update(message with deleted=true)
+    MessageDAO->>ClientDB: UPDATE messages SET deleted=true
+    ClientDB-->>MessageDAO: rowsAffected
+    MessageDAO-->>ChatController: updatedMessage
+    
+    %% Notify other clients via server
+    ChatController->>WebSocketSvc: deleteMessage(updatedMessage)
+    WebSocketSvc->>WebSocketHandler: deleteMessage(updatedMessage)
+    WebSocketHandler->>MsgProcessor: deleteMessage(updatedMessage)
+    
+    MsgProcessor->>MsgProcessor: Create WebSocketMessageDTO
+    MsgProcessor->>StompSession: send(chatTopic + "/delete", messageDTO)
+    StompSession->>ServerEndpoint: /app/chat/{chatId}/delete
+    
+    ServerEndpoint->>MessageMgmtCtrl: deleteMessage(chatId, messageDTO)
+    MessageMgmtCtrl->>MessageMgmtCtrl: validateMessage(messageDTO, chatId, true)
+    MessageMgmtCtrl->>SessionService: getUsersInChat(chatId)
+    
+    alt Valid Deletion Request
+        MessageMgmtCtrl->>ServerEndpoint: send to /topic/chat/{chatId}/delete
+        
+        %% Delete notification broadcast to all other clients
+        ServerEndpoint-->>StompSession: broadcast delete notification
+        StompSession-->>MsgProcessor: handleFrame(frame)
+        MsgProcessor->>MsgProcessor: processDeleteMessageEvent(dto)
+        
+        %% Other clients update their local database on receipt
+        MsgProcessor->>WebSocketHandler: notifyMessageReceived(deletedMessage)
+        WebSocketHandler->>WebSocketSvc: onMessageReceived(deletedMessage)
+        WebSocketSvc->>ChatController: notify message listeners
+        
+        alt Other Client Receivers
+            ChatController->>MessageDAO: update(message with deleted=true)
+            MessageDAO->>ClientDB: UPDATE messages SET deleted=true
+            ClientDB-->>MessageDAO: rowsAffected
+            MessageDAO-->>ChatController: success
+        end
+        
+        ChatController->>ClientUI: update UI to show deleted message
+    else Invalid Deletion Request
+        MessageMgmtCtrl->>MessageMgmtCtrl: Create error response
+        MessageMgmtCtrl->>ServerEndpoint: return error message
+        ServerEndpoint-->>StompSession: send error
+        StompSession-->>MsgProcessor: handleFrame(error)
+        MsgProcessor->>WebSocketHandler: notifyError(errorMessage)
+        WebSocketHandler->>WebSocketSvc: onError(errorMessage)
+        WebSocketSvc->>ChatController: notify error listeners
+        ChatController->>ClientUI: display error
+    end

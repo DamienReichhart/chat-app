@@ -1,0 +1,69 @@
+flowchart TD
+    classDef stageClass fill:#f9f,stroke:#333,stroke-width:2px
+    classDef jobClass fill:#bbf,stroke:#333,stroke-width:1px
+    classDef artifactClass fill:#bfb,stroke:#333,stroke-width:1px
+    classDef securityClass fill:#fbb,stroke:#333,stroke-width:1px
+    
+    GitPush([Git Push/MR]) --> validate
+    
+    subgraph stage1[Validation Stage]
+        validate(Validate Project):::jobClass
+        compile(Compile Code):::jobClass
+        validate --> compile
+    end
+    
+    subgraph stage2[Test Stage]
+        testCommon(Test Common Module):::jobClass
+        testClient(Test Client Module):::jobClass
+        testServer(Test Server Module):::jobClass
+        coverage(Code Coverage Report):::jobClass
+        security(Dependency Scanning):::securityClass
+        
+        testCommon --> testClient & testServer
+        testClient & testServer --> coverage
+    end
+    
+    subgraph stage3[Build Stage]
+        build(Build Project Artifacts):::jobClass
+    end
+    
+    subgraph stage4[Package Stage]
+        packageLinux(Package for Linux):::jobClass
+        packageWindows(Package for Windows):::jobClass
+    end
+    
+    subgraph stage5[Deploy Stage]
+        deploy(Deploy to Package Registry):::jobClass
+    end
+    
+    subgraph artifacts[Artifacts]
+        JARs([JAR Files]):::artifactClass
+        testReports([Test Reports]):::artifactClass
+        coverageReports([Coverage Reports]):::artifactClass
+        securityReports([Security Reports]):::artifactClass
+        linuxPackages([Linux Packages<br>.deb, .rpm]):::artifactClass
+        windowsPackages([Windows Packages<br>.exe, .msi]):::artifactClass
+    end
+    
+    compile --> testCommon
+    compile --> JARs
+    
+    testCommon & testClient & testServer --> testReports
+    coverage --> coverageReports
+    security --> securityReports
+    
+    coverage --> build
+    
+    build --> JARs
+    build --> packageLinux & packageWindows
+    
+    packageLinux --> linuxPackages
+    packageWindows --> windowsPackages
+    
+    linuxPackages & windowsPackages --> deploy
+    
+    stage1:::stageClass
+    stage2:::stageClass
+    stage3:::stageClass
+    stage4:::stageClass
+    stage5:::stageClass

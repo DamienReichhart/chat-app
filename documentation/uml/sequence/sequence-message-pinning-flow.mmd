@@ -1,0 +1,67 @@
+sequenceDiagram
+    %% Participants
+    participant ClientUI as Client UI
+    participant ChatController as Chat Controller
+    participant WebSocketSvc as WebSocketService
+    participant WebSocketHandler as WebSocketHandler
+    participant MsgProcessor as WebSocketMessageProcessor
+    participant StompSession as STOMP Session
+    participant ClientDB as Client Database
+    participant MessageDAO as Message DAO
+    participant ServerEndpoint as Server WebSocket Endpoint
+    participant PinController as Pin Controller
+    participant SessionService as Chat Session Service
+
+    %% Pin Message Flow
+    ClientUI->>ChatController: pinMessage(message)
+    
+    %% Update local database first
+    ChatController->>MessageDAO: update(message with pinned=true)
+    MessageDAO->>ClientDB: UPDATE messages SET pinned=true
+    ClientDB-->>MessageDAO: rowsAffected
+    MessageDAO-->>ChatController: updatedMessage
+    
+    %% Notify other clients via server
+    ChatController->>WebSocketSvc: pinMessage(updatedMessage)
+    WebSocketSvc->>WebSocketHandler: pinMessage(updatedMessage)
+    WebSocketHandler->>MsgProcessor: pinMessage(updatedMessage)
+    
+    MsgProcessor->>MsgProcessor: Create WebSocketMessageDTO
+    MsgProcessor->>StompSession: send(chatTopic + "/pin", messageDTO)
+    StompSession->>ServerEndpoint: /app/chat/{chatId}/pin
+    
+    ServerEndpoint->>PinController: pinMessage(chatId, messageDTO)
+    PinController->>PinController: validateMessage(messageDTO, chatId, true)
+    PinController->>SessionService: getUsersInChat(chatId)
+    
+    alt Valid Pin Request
+        PinController->>ServerEndpoint: send to /topic/chat/{chatId}/pin
+        
+        %% Pin notification broadcast to all other clients
+        ServerEndpoint-->>StompSession: broadcast pin notification
+        StompSession-->>MsgProcessor: handleFrame(frame)
+        MsgProcessor->>MsgProcessor: processPinMessageEvent(dto)
+        
+        %% Other clients update their local database on receipt
+        MsgProcessor->>WebSocketHandler: notifyMessageReceived(updatedMessage)
+        WebSocketHandler->>WebSocketSvc: onMessageReceived(updatedMessage)
+        WebSocketSvc->>ChatController: notify message listeners
+        
+        alt Other Client Receivers
+            ChatController->>MessageDAO: update(message with pinned=true)
+            MessageDAO->>ClientDB: UPDATE messages SET pinned=true
+            ClientDB-->>MessageDAO: rowsAffected
+            MessageDAO-->>ChatController: success
+        end
+        
+        ChatController->>ClientUI: update UI with pinned message
+    else Invalid Pin Request
+        PinController->>PinController: Create error response
+        PinController->>ServerEndpoint: return error message
+        ServerEndpoint-->>StompSession: send error
+        StompSession-->>MsgProcessor: handleFrame(error)
+        MsgProcessor->>WebSocketHandler: notifyError(errorMessage)
+        WebSocketHandler->>WebSocketSvc: onError(errorMessage)
+        WebSocketSvc->>ChatController: notify error listeners
+        ChatController->>ClientUI: display error
+    end

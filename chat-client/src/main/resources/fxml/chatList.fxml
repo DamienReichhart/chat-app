@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.SVGPath?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.Region?>
+
+<VBox xmlns="http://javafx.com/javafx/21.0.2"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.ap4.client.controllers.ChatListController"
+      styleClass="sidebar"
+      prefWidth="280.0">
+
+    <!-- Sidebar Header -->
+    <HBox styleClass="sidebar-header" alignment="CENTER_LEFT">
+        <Region HBox.hgrow="ALWAYS" />
+        <Label text="AP4" styleClass="chat-name" style="-fx-text-fill: white; -fx-font-size: 18px; -fx-font-weight: bold;" />
+        <Region HBox.hgrow="ALWAYS" />
+    </HBox>
+
+    <!-- Search Bar -->
+    <StackPane styleClass="sidebar-search-container">
+        <HBox styleClass="sidebar-search" alignment="CENTER_LEFT">
+            <SVGPath content="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" 
+                   style="-fx-fill: #8e8e93;" />
+            <TextField fx:id="searchField" promptText="Search" HBox.hgrow="ALWAYS" 
+                      styleClass="search-field" />
+        </HBox>
+    </StackPane>
+
+    <!-- Chat List -->
+    <ListView fx:id="contactListView" 
+              VBox.vgrow="ALWAYS" 
+              styleClass="chat-list" />
+</VBox>

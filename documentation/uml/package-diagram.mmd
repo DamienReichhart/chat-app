@@ -1,0 +1,73 @@
+graph TD
+    %% Main Projects
+    subgraph ProjectStructure["Chat Application Package Structure"]
+        chatCommon["chat-common"]
+        chatServer["chat-server"]
+        chatClient["chat-client"]
+    end
+    
+    %% Common Packages
+    subgraph CommonPackages["Common Packages"]
+        common_models["com.ap4.common.models"]
+        common_dto["com.ap4.common.dto"]
+        common_enums["com.ap4.common.enums"]
+        common_utils["com.ap4.common.utils"]
+        common_exceptions["com.ap4.common.exceptions"]
+    end
+    
+    %% Server Packages
+    subgraph ServerPackages["Server Packages"]
+        server_controllers["com.ap4.server.controllers"]
+        server_services["com.ap4.server.services"]
+        server_interfaces["com.ap4.server.interfaces"]
+        server_listener["com.ap4.server.listener"]
+        server_configuration["com.ap4.server.configuration"]
+    end
+    
+    %% Client Packages
+    subgraph ClientPackages["Client Packages"]
+        client_ui["com.ap4.client.ui"]
+        client_services["com.ap4.client.services"]
+        client_websocket["com.ap4.client.websocket"]
+        client_controllers["com.ap4.client.controllers"]
+        client_scenes["com.ap4.client.scenes"]
+        client_config["com.ap4.client.config"]
+        client_middlewares["com.ap4.client.middlewares"]
+        client_interfaces["com.ap4.client.interfaces"]
+        client_exceptions["com.ap4.client.exceptions"]
+        client_db["com.ap4.client.db"]
+    end
+    
+    %% Dependencies
+    chatCommon --- CommonPackages
+    chatServer --- ServerPackages
+    chatClient --- ClientPackages
+    
+    chatServer -.-> chatCommon
+    chatClient -.-> chatCommon
+    
+    %% Common Package Dependencies
+    common_models -.-> common_enums
+    common_dto -.-> common_models
+    common_utils -.-> common_exceptions
+    
+    %% Server Package Dependencies
+    server_controllers -.-> server_services
+    server_services -.-> server_interfaces
+    server_listener -.-> server_controllers
+    server_configuration -.-> server_services
+    
+    server_controllers -.-> common_dto
+    server_services -.-> common_models
+    
+    %% Client Package Dependencies
+    client_ui -.-> client_controllers
+    client_controllers -.-> client_services
+    client_services -.-> client_websocket
+    client_services -.-> client_db
+    client_scenes -.-> client_ui
+    client_config -.-> client_services
+    client_middlewares -.-> client_services
+    
+    client_controllers -.-> common_dto
+    client_services -.-> common_models

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Circle?>
+
+<VBox styleClass="dialog-container"
+      xmlns="http://javafx.com/javafx/21.0.2" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.ap4.client.controllers.GroupAddController">
+
+    <HBox alignment="CENTER_LEFT" spacing="15" styleClass="dialog-header">
+        <Circle fx:id="groupAvatar" styleClass="avatar-circle" radius="40" />
+
+        <VBox spacing="5">
+            <Label styleClass="dialog-label" text="Nom du groupe" />
+            <TextField fx:id="groupNameField" promptText="Entrez le nom du groupe" styleClass="dialog-input" />
+        </VBox>
+    </HBox>
+
+    <VBox spacing="5" styleClass="dialog-section">
+        <Label styleClass="dialog-label" text="Description du groupe" />
+        <TextField fx:id="groupDescriptionField" promptText="Entrez la description du groupe" styleClass="dialog-input" />
+    </VBox>
+
+    <Button fx:id="createButton" styleClass="dialog-button, primary-button" text="Créer" onAction="#handleCreateButton" />
+</VBox>

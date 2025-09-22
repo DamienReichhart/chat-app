@@ -1,0 +1,77 @@
+@startuml
+left to right direction
+skinparam actorStyle awesome
+skinparam usecase {
+  BackgroundColor LightBlue
+  BorderColor DarkSlateGray
+}
+skinparam rectangle {
+  BackgroundColor LightGray
+  BorderColor DarkSlateGray
+}
+
+' Actors
+actor "Utilisateur non authentifié" as Visitor
+actor "Utilisateur standard"    as User
+
+' Actor inheritance
+User --|> Visitor
+
+package "Application" {
+  
+  ' Use cases – Gestion des utilisateurs
+  usecase "S'inscrire"     as UC1
+  usecase "Se connecter"   as UC2
+  usecase "Se déconnecter" as UC4
+
+  ' Use cases – Gestion des conversations
+  usecase "Créer une conversation"               as UC5
+  usecase "Créer une conversation individuelle"  as UC5a
+  usecase "Créer un groupe"                     as UC5b
+  usecase "Créer un canal"                      as UC5c
+  usecase "Rejoindre un groupe"                 as UC6
+  usecase "Rejoindre un canal"                  as UC7
+  usecase "Quitter une conversation"            as UC8
+
+  ' Use cases – Messagerie
+  usecase "Envoyer un message"            as UC9
+  usecase "Envoyer un message texte"      as UC9a
+  usecase "Envoyer un fichier"            as UC9b
+  usecase "Envoyer une image"             as UC9c
+  usecase "Envoyer un message anonyme"    as UC9d
+  usecase "Épingler un message"           as UC10
+  usecase "Supprimer son message"         as UC11
+
+  ' Use cases utilitaires
+  usecase "Vérifier les droits d'accès"     as UC16
+  usecase "Définir les paramètres du canal" as UC18
+
+  ' Generalizations
+  UC5a --|> UC5
+  UC5b --|> UC5
+  UC5c --|> UC5
+
+  ' Include relationships
+  UC9  ..> UC16 : <<include>>
+  UC5c ..> UC18 : <<include>>
+
+  ' Extend relationships
+  UC9a ..> UC9 : <<extend>>
+  UC9b ..> UC9 : <<extend>>
+  UC9c ..> UC9 : <<extend>>
+  UC9d ..> UC9 : <<extend>>
+}
+
+' Actor–use case associations
+Visitor -- UC1
+Visitor -- UC2
+
+User -- UC4
+User -- UC5
+User -- UC6
+User -- UC7
+User -- UC8
+User -- UC9
+User -- UC10
+User -- UC11
+@enduml

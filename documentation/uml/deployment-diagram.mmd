@@ -1,0 +1,31 @@
+graph TD
+    %% Nodes
+    subgraph Client["Client Machine"]
+        JavaFX["JavaFX Application"]
+        ClientNode["Chat Client Application"]
+        style ClientNode fill:#f9f,stroke:#333,stroke-width:2px
+    end
+
+    subgraph Server["Server Machine"]
+        SpringBoot["Spring Boot Application"]
+        ServerNode["Chat Server Application"]
+        style ServerNode fill:#bbf,stroke:#333,stroke-width:2px
+    end
+
+    subgraph DatabaseServer["Database Server"]
+            PostgreSQL["PostgreSQL Database"]
+            style PostgreSQL fill:#bfb,stroke:#333,stroke-width:2px
+        end
+
+    %% Relationships
+    JavaFX --> ClientNode
+    SpringBoot --> ServerNode
+    ClientNode --> PostgreSQL
+    
+    %% Communication
+    ClientNode <--> |"WebSocket (STOMP over SockJS)"| ServerNode
+    ClientNode <--> |"JDBC"| PostgreSQL
+    
+    %% Additional Notes
+    classDef container fill:#fff,stroke:#999,stroke-width:1px,color:#333,rx:5px,ry:5px
+    class Client,Server,DatabaseServer container

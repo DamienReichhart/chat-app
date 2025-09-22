@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.Circle?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21.0.2"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.ap4.client.controllers.UserEditController"
+            styleClass="main-container">
+            
+    <center>
+        <VBox alignment="CENTER" spacing="20" styleClass="dialog-container">
+            <padding>
+                <Insets top="20" right="20" bottom="20" left="20"/>
+            </padding>
+                      
+            <Label text="Modifier votre profil"
+                  styleClass="dialog-title"
+                  alignment="CENTER"
+                  maxWidth="Infinity"/>
+                      
+            <HBox spacing="15" alignment="CENTER" styleClass="dialog-header">
+                <Circle fx:id="userAvatar"
+                        radius="40"
+                        styleClass="avatar-circle" />
+    
+                <VBox spacing="5">
+                    <Label text="Nom d'utilisateur"
+                          styleClass="dialog-label" />
+                    <Label fx:id="usernameLabel"
+                          styleClass="dialog-subtitle" />
+                </VBox>
+            </HBox>
+    
+            <VBox spacing="5" styleClass="dialog-section">
+                <Label text="Email"
+                      styleClass="dialog-label" />
+                <TextField fx:id="emailField"
+                          promptText="Entrez votre nouvelle adresse email"
+                          styleClass="dialog-input" />
+            </VBox>
+    
+            <VBox spacing="5" styleClass="dialog-section">
+                <Label text="Changer le mot de passe"
+                      styleClass="dialog-label" />
+                <PasswordField fx:id="currentPasswordField"
+                              promptText="Mot de passe actuel"
+                              styleClass="dialog-input" />
+                <PasswordField fx:id="newPasswordField"
+                              promptText="Nouveau mot de passe"
+                              styleClass="dialog-input" />
+                <PasswordField fx:id="confirmPasswordField"
+                              promptText="Confirmer le nouveau mot de passe"
+                              styleClass="dialog-input" />
+            </VBox>
+            
+            <HBox spacing="10" alignment="CENTER">
+                <Button fx:id="saveButton"
+                        text="Enregistrer"
+                        onAction="#handleSave"
+                        styleClass="dialog-button, primary-button"/>
+                        
+                <Button fx:id="cancelButton"
+                        text="Annuler"
+                        onAction="#handleCancel"
+                        styleClass="dialog-button"/>
+            </HBox>
+            
+            <Label fx:id="errorLabel" 
+                  styleClass="status-text"
+                  alignment="CENTER"
+                  maxWidth="Infinity"/>
+        </VBox>
+    </center>
+</BorderPane>

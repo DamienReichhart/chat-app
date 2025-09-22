@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import java.net.URL?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21.0.2"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.ap4.client.controllers.MainController"
+            fx:id="mainBorderPane"
+            styleClass="main-container"
+            prefHeight="700.0" prefWidth="1000.0">
+
+    <left>
+        <fx:include fx:id="chatList" source="chatList.fxml"/>
+    </left>
+
+    <center>
+        <VBox>
+            <children>
+                <fx:include fx:id="topBar" source="topBar.fxml"/>
+                <fx:include fx:id="chatContent" source="chatContent.fxml" VBox.vgrow="ALWAYS"/>
+            </children>
+        </VBox>
+    </center>
+
+</BorderPane>

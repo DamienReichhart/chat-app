@@ -1,0 +1,88 @@
+sequenceDiagram
+    %% Participants
+    participant ClientUI as Client UI
+    participant ChatController as Chat Controller
+    participant ChatSvc as Chat Service
+    participant WebSocketSvc as WebSocketService
+    participant WebSocketHandler as WebSocketHandler
+    participant MsgProcessor as WebSocketMessageProcessor
+    participant StompSession as STOMP Session
+    participant ClientDB as Client Database
+    participant ChatDAO as Chat DAO
+    participant ChatParticipantDAO as ChatParticipant DAO
+    participant ServerEndpoint as Server WebSocket Endpoint
+    participant SubController as Subscription Controller
+    participant SessionService as Chat Session Service
+
+    %% Join Chat Flow
+    ClientUI->>ChatController: joinChat(chat)
+    
+    %% Update local database to record chat participation
+    ChatController->>ChatSvc: joinChat(chat, currentUser)
+    ChatSvc->>ChatParticipantDAO: createOrUpdate(chatParticipant)
+    ChatParticipantDAO->>ClientDB: INSERT or UPDATE chat_participants
+    ClientDB-->>ChatParticipantDAO: success
+    ChatParticipantDAO-->>ChatSvc: participantRecord
+    ChatSvc-->>ChatController: success
+    
+    %% Connect to WebSocket server for this chat
+    ChatController->>WebSocketSvc: joinChat(chat)
+    
+    alt WebSocket Connected
+        WebSocketSvc->>WebSocketSvc: Add to joinedChats
+        WebSocketSvc->>WebSocketHandler: joinChat(chat)
+        WebSocketHandler->>MsgProcessor: joinChat(chat)
+        
+        %% Prepare chat subscriptions
+        MsgProcessor->>StompSession: subscribe(chatTopic + "/message")
+        MsgProcessor->>StompSession: subscribe(chatTopic + "/pin")
+        MsgProcessor->>StompSession: subscribe(chatTopic + "/unpin")
+        MsgProcessor->>StompSession: subscribe(chatTopic + "/delete")
+        MsgProcessor->>StompSession: subscribe(chatTopic + "/join")
+        MsgProcessor->>StompSession: subscribe(chatTopic + "/leave")
+        
+        %% Send join notification to server
+        MsgProcessor->>MsgProcessor: Create WebSocketMessageDTO
+        MsgProcessor->>StompSession: send(chatTopic + "/join", messageDTO)
+        StompSession->>ServerEndpoint: /app/chat/{chatId}/join
+        
+        ServerEndpoint->>SubController: handleJoinChatMessage(chatId, messageDTO)
+        SubController->>SubController: validateMessage(messageDTO, chatId, true)
+        
+        alt Valid Join Request
+            %% Update server-side session registry 
+            SubController->>SessionService: addUserToChat(chatId, userId, sessionId)
+            SubController->>ServerEndpoint: send to /topic/chat/{chatId}/join
+            
+            %% Join notification broadcast
+            ServerEndpoint-->>StompSession: broadcast join notification
+            StompSession-->>MsgProcessor: handleFrame(frame)
+            MsgProcessor->>MsgProcessor: processJoinChatEvent(dto)
+            MsgProcessor->>WebSocketHandler: notifyMessageReceived(systemMessage)
+            WebSocketHandler->>WebSocketSvc: onMessageReceived(systemMessage)
+            WebSocketSvc->>ChatController: notify message listeners
+            
+            %% Load message history from local database
+            ChatController->>ChatSvc: loadChatHistory(chatId)
+            ChatSvc->>ChatDAO: getChatById(chatId)
+            ChatDAO->>ClientDB: SELECT * FROM chats
+            ClientDB-->>ChatDAO: chatData
+            ChatDAO-->>ChatSvc: chat
+            
+            ChatController->>ClientUI: update UI with join notification
+        else Invalid Join Request
+            SubController->>SubController: Create error response
+            SubController->>ServerEndpoint: return error message
+            ServerEndpoint-->>StompSession: send error
+            StompSession-->>MsgProcessor: handleFrame(error)
+            MsgProcessor->>WebSocketHandler: notifyError(errorMessage)
+            WebSocketHandler->>WebSocketSvc: onError(errorMessage)
+            WebSocketSvc->>ChatController: notify error listeners
+            ChatController->>ClientUI: display error
+        end
+    else WebSocket Not Connected
+        WebSocketSvc->>WebSocketSvc: Add to pendingJoins queue
+        WebSocketSvc-->>ChatController: indicate pending operation
+        ChatController-->>ClientUI: update UI (connecting state)
+        Note over WebSocketSvc: Will be processed when<br/>connection is established
+    end 

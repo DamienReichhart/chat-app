@@ -1,0 +1,61 @@
+sequenceDiagram
+    %% Participants
+    participant ClientUI as Client UI
+    participant ChatController as Chat Controller
+    participant ChatSvc as Chat Service
+    participant WebSocketSvc as WebSocketService
+    participant WebSocketHandler as WebSocketHandler
+    participant MsgProcessor as WebSocketMessageProcessor
+    participant StompSession as STOMP Session
+    participant ClientDB as Client Database
+    participant ChatParticipantDAO as ChatParticipant DAO
+    participant ServerEndpoint as Server WebSocket Endpoint
+    participant ServerController as Server Controller
+    participant SessionService as Chat Session Service
+
+    %% Leave Chat Flow
+    ClientUI->>ChatController: leaveChat(chat)
+    
+    %% Update local database to record leaving chat
+    ChatController->>ChatSvc: leaveChat(chat, currentUser)
+    ChatSvc->>ChatParticipantDAO: updateStatus(chatId, userId, status=inactive)
+    ChatParticipantDAO->>ClientDB: UPDATE chat_participants SET status = 'inactive'
+    ClientDB-->>ChatParticipantDAO: rowsAffected
+    ChatParticipantDAO-->>ChatSvc: success
+    ChatSvc-->>ChatController: success
+    
+    %% Notify server and other clients about leaving
+    ChatController->>WebSocketSvc: leaveChat(chat)
+    WebSocketSvc->>WebSocketSvc: Remove from joinedChats
+    WebSocketSvc->>WebSocketHandler: leaveChat(chat)
+    WebSocketHandler->>MsgProcessor: leaveChat(chat)
+    MsgProcessor->>MsgProcessor: Create WebSocketMessageDTO
+    
+    %% Send leave message to server
+    MsgProcessor->>StompSession: send(chatTopic + "/leave", messageDTO)
+    StompSession->>ServerEndpoint: /app/chat/{chatId}/leave
+    
+    Note over ServerEndpoint,ServerController: STOMP Message Routing
+    ServerEndpoint->>ServerController: handleLeaveChatMessage(chatId, message)
+    ServerController->>ServerController: validateMessage()
+    
+    %% Update server-side session registry
+    ServerController->>SessionService: removeUserFromChat(chatId, userId)
+    
+    %% Broadcast leave notification to other clients
+    ServerController->>ServerEndpoint: send to /topic/chat/{chatId}/leave
+    ServerEndpoint-->>StompSession: message notification
+    
+    %% Unsubscribe from all chat topics
+    MsgProcessor->>MsgProcessor: unsubscribeFromChat(chatId)
+    MsgProcessor->>StompSession: unsubscribe(chatTopic + "/message")
+    MsgProcessor->>StompSession: unsubscribe(chatTopic + "/pin")
+    MsgProcessor->>StompSession: unsubscribe(chatTopic + "/unpin")
+    MsgProcessor->>StompSession: unsubscribe(chatTopic + "/delete")
+    MsgProcessor->>StompSession: unsubscribe(chatTopic + "/join")
+    MsgProcessor->>StompSession: unsubscribe(chatTopic + "/leave")
+    
+    MsgProcessor->>WebSocketHandler: notifyError/notifyStatus (if error)
+    WebSocketHandler->>WebSocketSvc: onError/onStatusChange (if error)
+    WebSocketSvc->>ChatController: notify listeners
+    ChatController->>ClientUI: update UI (chat left)

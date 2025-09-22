@@ -1,0 +1,70 @@
+graph TD
+    %% Acteurs
+    Visitor([Utilisateur non authentifié])
+    User([Utilisateur standard])
+
+    %% Héritage d'acteurs
+    Visitor --> User
+
+    %% Cas d'utilisation - Gestion des utilisateurs
+    UC1[S'inscrire]
+    UC2[Se connecter]
+    UC4[Se déconnecter]
+
+    %% Cas d'utilisation - Gestion des conversations
+    UC5[Créer une conversation]
+    UC5a[Créer une conversation individuelle]
+    UC5b[Créer un groupe]
+    UC5c[Créer un canal]
+    UC6[Rejoindre un groupe]
+    UC7[Rejoindre un canal]
+    UC8[Quitter une conversation]
+
+    %% Cas d'utilisation - Messagerie
+    UC9[Envoyer un message]
+    UC9a[Envoyer un message texte]
+    UC9b[Envoyer un fichier]
+    UC9c[Envoyer une image]
+    UC9d[Envoyer un message anonyme]
+    UC10[Épingler un message]
+    UC11[Supprimer son message]
+
+    %% Cas d'utilisation utilitaires
+    UC16[Vérifier les droits d'accès]
+    UC18[Définir les paramètres du canal]
+
+    %% Relations d'héritage
+    UC5 --> UC5a
+    UC5 --> UC5b
+    UC5 --> UC5c
+
+    %% Relations d'inclusion
+    UC9 -.-> UC16
+    UC5c -.-> UC18
+
+    %% Relations d'extension
+    UC9a -.-> UC9
+    UC9b -.-> UC9
+    UC9c -.-> UC9
+    UC9d -.-> UC9
+
+    %% Relations acteur-cas d'utilisation
+    Visitor --- UC1
+    Visitor --- UC2
+    User --- UC4
+    User --- UC5
+    User --- UC6
+    User --- UC7
+    User --- UC8
+    User --- UC9
+    User --- UC10
+    User --- UC11
+
+    %% Styles
+    classDef actor fill:#f9f,stroke:#333,stroke-width:2px
+    classDef usecase fill:#bbf,stroke:#333,stroke-width:1px
+    classDef utility fill:#ddd,stroke:#333,stroke-width:1px
+    
+    class Visitor,User,Admin actor
+    class UC1,UC2,UC3,UC4,UC5,UC5a,UC5b,UC5c,UC6,UC7,UC8,UC9,UC9a,UC9b,UC9c,UC9d,UC10,UC11 usecase
+    class UC16,UC17,UC18 utility

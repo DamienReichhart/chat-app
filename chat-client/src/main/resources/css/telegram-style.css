@@ -1,0 +1,668 @@
+/* Telegram Style CSS for JavaFX */
+
+/* Color variables */
+* {
+    -telegram-primary: #0088cc;
+    -telegram-primary-dark: #006da3;
+    -telegram-background: #ffffff;
+    background: #ffffff;
+    -telegram-sidebar-bg: #ffffff;
+    -telegram-sidebar-hover: #f5f5f5;
+    -telegram-icon-color: #707579;
+    -telegram-text-primary: #000000;
+    -telegram-text-secondary: #707579;
+    -telegram-message-outgoing: #effdde;
+    -telegram-message-incoming: #ffffff;
+    -telegram-divider: #f1f1f1;
+    -telegram-unread: #4fad2d;
+    -telegram-online: #4fad2d;
+    -telegram-button: #f1f1f1;
+    -telegram-button-hover: #e8e8e8;
+}
+
+/* -- Root Elements -- */
+.root {
+    -fx-background-color: -telegram-background;
+    -fx-font-family: 'Roboto', 'Segoe UI', 'Helvetica', sans-serif;
+    -fx-font-size: 13px;
+    background-color: -telegram-background;
+    font-family: 'Roboto', 'Segoe UI', 'Helvetica', sans-serif;
+    font-size: 13px;
+}
+
+/* -- Main Layout -- */
+.main-container {
+    -fx-background-color: -telegram-background;
+    background-color: -telegram-background;
+}
+
+/* -- Login Page -- */
+.login-logo {
+    -fx-fill: -telegram-primary;
+    fill: -telegram-primary;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 10, 0, 0, 5);
+}
+
+.telegram-text-field {
+    -fx-background-color: transparent;
+    background-color: transparent;
+    -fx-border-color: #d9d9d9;
+    border-color: #d9d9d9;
+    -fx-border-width: 0 0 1 0;
+    border-width: 0 0 1px 0;
+    -fx-prompt-text-fill: #999999;
+    -fx-text-fill: #333333;
+    -fx-font-size: 14px;
+    font-size: 14px;
+    -fx-focus-color: -telegram-primary;
+    -fx-faint-focus-color: transparent;
+}
+
+.telegram-text-field:focused {
+    -fx-border-color: -telegram-primary;
+    border-color: -telegram-primary;
+}
+
+.telegram-primary-button {
+    -fx-background-color: -telegram-primary;
+    background-color: -telegram-primary;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    font-weight: bold;
+    -fx-background-radius: 5;
+    -fx-cursor: hand;
+    cursor: pointer;
+}
+
+.telegram-primary-button:hover {
+    -fx-background-color: -telegram-primary-dark;
+    background-color: -telegram-primary-dark;
+}
+
+.telegram-link-button {
+    -fx-background-color: transparent;
+    background-color: transparent;
+    -fx-text-fill: -telegram-primary;
+    -fx-cursor: hand;
+    cursor: pointer;
+    -fx-padding: 0;
+    padding: 0;
+}
+
+/* -- Sidebar -- */
+.sidebar {
+    -fx-background-color: -telegram-sidebar-bg;
+    -fx-padding: 0;
+    -fx-border-color: -telegram-divider;
+    -fx-border-width: 0 1px 0 0;
+    background-color: -telegram-sidebar-bg;
+    padding: 0;
+    border-color: -telegram-divider;
+    border-width: 0 1px 0 0;
+}
+
+.sidebar-header {
+    -fx-background-color: -telegram-primary;
+    -fx-padding: 12px 16px;
+    -fx-spacing: 8px;
+    background-color: -telegram-primary;
+    padding: 12px 16px;
+    gap: 8px; /* CSS equivalent of spacing */
+}
+
+.icon-button {
+    -fx-background-color: transparent;
+    -fx-padding: 8px;
+    -fx-cursor: hand;
+    background-color: transparent;
+    padding: 8px;
+    cursor: pointer;
+}
+
+.icon-button SVGPath {
+    -fx-fill: white;
+    fill: white;
+}
+
+.icon-button:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.1);
+    background-color: rgba(255, 255, 255, 0.1);
+    -fx-background-radius: 50%;
+}
+
+.sidebar-search-container {
+    -fx-background-color: -telegram-sidebar-bg;
+    -fx-padding: 8px 12px;
+    background-color: -telegram-sidebar-bg;
+    padding: 8px 12px;
+}
+
+.sidebar-search {
+    -fx-background-color: #f0f0f0;
+    -fx-background-radius: 22px;
+    -fx-padding: 8px 12px;
+    -fx-spacing: 8px;
+    -fx-alignment: center-left;
+    background-color: #f0f0f0;
+    border-radius: 22px;
+    padding: 8px 12px;
+    gap: 8px; /* CSS equivalent of spacing */
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.search-container {
+    -fx-background-color: #f0f0f0;
+    -fx-background-radius: 22px;
+    -fx-padding: 6px 12px;
+    -fx-spacing: 6px;
+    background-color: #f0f0f0;
+    border-radius: 22px;
+    padding: 6px 12px;
+    gap: 6px; /* CSS equivalent of spacing */
+}
+
+.search-field {
+    -fx-background-color: transparent;
+    -fx-text-fill: -telegram-text-primary;
+    -fx-prompt-text-fill: #8a8d93;
+    -fx-font-size: 14px;
+    -fx-padding: 4px 0;
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+    background-color: transparent;
+    color: -telegram-text-primary;
+    font-size: 14px;
+    padding: 4px 0;
+}
+
+/* -- Chat List Cell -- */
+.chat-list {
+    -fx-background-color: -telegram-sidebar-bg;
+    -fx-padding: 0;
+    -fx-border-width: 0;
+    background-color: -telegram-sidebar-bg;
+    padding: 0;
+    border-width: 0;
+}
+
+.chat-list .list-cell {
+    -fx-background-color: -telegram-sidebar-bg;
+    -fx-padding: 10px 16px;
+    -fx-cursor: hand;
+    background-color: -telegram-sidebar-bg;
+    padding: 10px 16px;
+    cursor: pointer;
+}
+
+.chat-list .list-cell:hover {
+    -fx-background-color: -telegram-sidebar-hover;
+    background-color: -telegram-sidebar-hover;
+}
+
+.chat-list .list-cell:selected {
+    -fx-background-color: #e6f2fa;
+    background-color: #e6f2fa;
+}
+
+.chat-list-cell {
+    -fx-background-color: -telegram-sidebar-bg;
+    -fx-padding: 10px 16px;
+    -fx-cursor: hand;
+    background-color: -telegram-sidebar-bg;
+    padding: 10px 16px;
+    cursor: pointer;
+}
+
+.chat-list-cell:hover {
+    -fx-background-color: -telegram-sidebar-hover;
+    background-color: -telegram-sidebar-hover;
+}
+
+.chat-list-cell:selected {
+    -fx-background-color: #e6f2fa;
+    background-color: #e6f2fa;
+}
+
+.status-indicator {
+    -fx-fill: -telegram-online;
+    fill: -telegram-online;
+    -fx-stroke: -telegram-sidebar-bg;
+    stroke: -telegram-sidebar-bg;
+    -fx-stroke-width: 2;
+    stroke-width: 2;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 2, 0, 0, 0);
+}
+
+.avatar {
+    -fx-fill: -telegram-primary;
+    fill: -telegram-primary;
+    -fx-stroke: transparent;
+    stroke: transparent;
+    -fx-stroke-width: 0;
+    stroke-width: 0;
+}
+
+.avatar-text {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 16px;
+    color: white;
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.chat-name {
+    -fx-text-fill: -telegram-text-primary;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    color: -telegram-text-primary;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.last-message {
+    -fx-text-fill: -telegram-text-secondary;
+    -fx-font-size: 13px;
+    -fx-text-overrun: ellipsis;
+    color: -telegram-text-secondary;
+    font-size: 13px;
+    text-overflow: ellipsis;
+}
+
+.time {
+    -fx-text-fill: -telegram-text-secondary;
+    -fx-font-size: 12px;
+    color: -telegram-text-secondary;
+    font-size: 12px;
+}
+
+.unread-count {
+    -fx-background-color: -telegram-unread;
+    -fx-text-fill: white;
+    -fx-background-radius: 10px;
+    -fx-padding: 2px 6px;
+    -fx-font-size: 11px;
+    background-color: -telegram-unread;
+    color: white;
+    border-radius: 10px;
+    padding: 2px 6px;
+    font-size: 11px;
+}
+
+/* -- Chat Header -- */
+.chat-header {
+    -fx-background-color: #ffffff;
+    -fx-padding: 10px 16px;
+    -fx-spacing: 12px;
+    -fx-border-color: -telegram-divider;
+    -fx-border-width: 0 0 1px 0;
+    background-color: #ffffff;
+    padding: 10px 16px;
+    gap: 12px; /* CSS equivalent of spacing */
+    border-color: -telegram-divider;
+    border-width: 0 0 1px 0;
+}
+
+.chat-header .icon-button SVGPath {
+    -fx-fill: #707579;
+    fill: #707579;
+}
+
+.chat-header .icon-button:hover {
+    -fx-background-color: rgba(112, 117, 121, 0.1);
+    background-color: rgba(112, 117, 121, 0.1);
+}
+
+.avatar-container {
+    -fx-padding: 2px;
+    padding: 2px;
+}
+
+.chat-title-container {
+    -fx-spacing: 2px;
+    gap: 2px; /* CSS equivalent of spacing */
+}
+
+.title {
+    -fx-text-fill: -telegram-text-primary;
+    -fx-font-weight: bold;
+    -fx-font-size: 15px;
+    color: -telegram-text-primary;
+    font-weight: bold;
+    font-size: 15px;
+}
+
+.subtitle {
+    -fx-text-fill: -telegram-text-secondary;
+    -fx-font-size: 13px;
+    color: -telegram-text-secondary;
+    font-size: 13px;
+}
+
+.message-list {
+    -fx-background-color: #e6ebee;
+    -fx-padding: 10px;
+    -fx-border-width: 0;
+    background-color: #e6ebee;
+    padding: 10px;
+    border-width: 0;
+}
+
+.message-list .list-cell {
+    -fx-background-color: transparent;
+    -fx-padding: 4px 0;
+    background-color: transparent;
+    padding: 4px 0;
+}
+
+.message-bubble {
+    -fx-background-radius: 8px;
+    -fx-padding: 8px 12px;
+    -fx-max-width: 80%;
+    border-radius: 8px;
+    padding: 8px 12px;
+    max-width: 80%;
+}
+
+.message-outgoing {
+    -fx-background-color: -telegram-message-outgoing;
+    -fx-alignment: center-right;
+    -fx-background-radius: 16px 16px 0 16px;
+    background-color: -telegram-message-outgoing;
+    text-align: right;
+    border-radius: 16px 16px 0 16px;
+}
+
+.message-incoming {
+    -fx-background-color: -telegram-message-incoming;
+    -fx-alignment: center-left;
+    -fx-background-radius: 16px 16px 16px 0;
+    background-color: -telegram-message-incoming;
+    text-align: left;
+    border-radius: 16px 16px 16px 0;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.05), 1, 0, 0, 1);
+}
+
+.message-text {
+    -fx-text-fill: -telegram-text-primary;
+    -fx-font-size: 14px;
+    -fx-wrap-text: true;
+    color: -telegram-text-primary;
+    font-size: 14px;
+    word-wrap: break-word;
+    -fx-line-spacing: 1.2;
+    line-height: 1.2;
+}
+
+.message-time {
+    -fx-text-fill: -telegram-text-secondary;
+    -fx-font-size: 11px;
+    -fx-alignment: bottom-right;
+    -fx-opacity: 0.8;
+    color: -telegram-text-secondary;
+    font-size: 11px;
+    text-align: right;
+    vertical-align: bottom;
+    opacity: 0.8;
+}
+
+/* -- Input Area -- */
+.input-area {
+    -fx-background-color: #ffffff;
+    -fx-padding: 10px 16px;
+    -fx-border-color: -telegram-divider;
+    -fx-border-width: 1px 0 0 0;
+    background-color: #ffffff;
+    padding: 10px 16px;
+    border-color: -telegram-divider;
+    border-width: 1px 0 0 0;
+}
+
+.input-field {
+    -fx-background-color: #f0f0f0;
+    -fx-background-radius: 20px;
+    -fx-padding: 8px 12px;
+    -fx-prompt-text-fill: -telegram-text-secondary;
+    -fx-text-fill: -telegram-text-primary;
+    -fx-font-size: 14px;
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+    background-color: #f0f0f0;
+    border-radius: 20px;
+    padding: 8px 12px;
+    color: -telegram-text-primary;
+    font-size: 14px;
+}
+
+.send-button {
+    -fx-background-color: -telegram-primary;
+    -fx-background-radius: 50%;
+    -fx-padding: 8px;
+    -fx-cursor: hand;
+    background-color: -telegram-primary;
+    border-radius: 50%;
+    padding: 8px;
+    cursor: pointer;
+}
+
+.send-button:hover {
+    -fx-background-color: -telegram-primary-dark;
+    background-color: -telegram-primary-dark;
+}
+
+/* -- Floating Action Button -- */
+.floating-action-button {
+    -fx-background-color: -telegram-primary;
+    -fx-background-radius: 28px;
+    -fx-padding: 10px;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 8, 0, 0, 4);
+    background-color: -telegram-primary;
+    border-radius: 28px;
+    padding: 10px;
+    cursor: pointer;
+}
+
+.floating-action-button:hover {
+    -fx-background-color: -telegram-primary-dark;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.4), 10, 0, 0, 6);
+    background-color: -telegram-primary-dark;
+}
+
+/* Dialog Styles */
+.dialog-container {
+    -fx-background-color: -telegram-background;
+    background-color: -telegram-background;
+    -fx-padding: 20px;
+    padding: 20px;
+    -fx-spacing: 15px;
+    -fx-pref-width: 400px;
+    -fx-pref-height: 450px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 10, 0, 0, 5);
+    -fx-background-radius: 8px;
+    border-radius: 8px;
+}
+
+.dialog-header {
+    -fx-padding: 0 0 10 0;
+    padding: 0 0 10px 0;
+    -fx-border-color: transparent transparent -telegram-divider transparent;
+    border-color: transparent transparent -telegram-divider transparent;
+    -fx-border-width: 0 0 1 0;
+    border-width: 0 0 1px 0;
+    -fx-border-insets: 0 0 10 0;
+}
+
+.dialog-section {
+    -fx-padding: 5 0;
+    padding: 5px 0;
+}
+
+.dialog-title {
+    -fx-font-size: 22px;
+    font-size: 22px;
+    -fx-font-weight: bold;
+    font-weight: bold;
+    -fx-fill: -telegram-text-primary;
+    fill: -telegram-text-primary;
+    -fx-text-alignment: center;
+    text-align: center;
+}
+
+.dialog-subtitle {
+    -fx-font-size: 14px;
+    font-size: 14px;
+    -fx-font-weight: bold;
+    font-weight: bold;
+    -fx-fill: -telegram-text-primary;
+    fill: -telegram-text-primary;
+}
+
+.dialog-label {
+    -fx-font-weight: bold;
+    font-weight: bold;
+    -fx-text-fill: -telegram-text-primary;
+    color: -telegram-text-primary;
+}
+
+.dialog-input {
+    -fx-background-color: -telegram-button;
+    background-color: -telegram-button;
+    -fx-background-radius: 8px;
+    border-radius: 8px;
+    -fx-padding: 8px 10px;
+    padding: 8px 10px;
+    -fx-text-fill: -telegram-text-primary;
+    color: -telegram-text-primary;
+    -fx-prompt-text-fill: -telegram-text-secondary;
+}
+
+.dialog-input:focused {
+    -fx-background-color: white;
+    background-color: white;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 3, 0, 0, 2);
+    -fx-border-color: -telegram-primary;
+    border-color: -telegram-primary;
+    -fx-border-width: 1px;
+    border-width: 1px;
+    -fx-border-radius: 8px;
+    border-radius: 8px;
+}
+
+.dialog-button {
+    -fx-background-color: -telegram-button;
+    background-color: -telegram-button;
+    -fx-text-fill: -telegram-text-primary;
+    color: -telegram-text-primary;
+    -fx-background-radius: 8px;
+    border-radius: 8px;
+    -fx-padding: 10px 15px;
+    padding: 10px 15px;
+    -fx-cursor: hand;
+    cursor: pointer;
+}
+
+.dialog-button:hover {
+    -fx-background-color: -telegram-button-hover;
+    background-color: -telegram-button-hover;
+}
+
+.dialog-button.primary-button {
+    -fx-background-color: -telegram-primary;
+    background-color: -telegram-primary;
+    -fx-text-fill: white;
+    color: white;
+}
+
+.dialog-button.primary-button:hover {
+    -fx-background-color: -telegram-primary-dark;
+    background-color: -telegram-primary-dark;
+}
+
+.dialog-list-view {
+    -fx-background-color: -telegram-background;
+    background-color: -telegram-background;
+    -fx-background-radius: 8px;
+    border-radius: 8px;
+    -fx-border-color: -telegram-divider;
+    border-color: -telegram-divider;
+    -fx-border-width: 1px;
+    border-width: 1px;
+    -fx-border-radius: 8px;
+    border-radius: 8px;
+}
+
+.dialog-list-view .list-cell {
+    -fx-background-color: -telegram-background;
+    background-color: -telegram-background;
+    -fx-text-fill: -telegram-text-primary;
+    color: -telegram-text-primary;
+    -fx-padding: 10px;
+    padding: 10px;
+}
+
+.dialog-list-view .list-cell:hover {
+    -fx-background-color: -telegram-sidebar-hover;
+    background-color: -telegram-sidebar-hover;
+}
+
+.dialog-list-view .list-cell:selected {
+    -fx-background-color: -telegram-sidebar-hover;
+    background-color: -telegram-sidebar-hover;
+    -fx-text-fill: -telegram-primary;
+    color: -telegram-primary;
+}
+
+.status-text {
+    -fx-fill: #d32020;
+    fill: #d32020;
+    -fx-font-style: italic;
+    font-style: italic;
+}
+
+.search-box {
+    -fx-padding: 5px;
+    padding: 5px;
+}
+
+.avatar-circle {
+    -fx-fill: -telegram-sidebar-hover;
+    fill: -telegram-sidebar-hover;
+    -fx-stroke: -telegram-divider;
+    stroke: -telegram-divider;
+    -fx-stroke-width: 1;
+    stroke-width: 1;
+}
+
+/* Animation classes will be handled by Java code */
+.fade-in {
+    -fx-opacity: 1;
+    opacity: 1;
+    transition: opacity 0.3s;
+}
+
+.fade-out {
+    -fx-opacity: 0;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.slide-in {
+    transition: transform 0.3s;
+}
+
+.slide-out {
+    transition: transform 0.3s;
+}
+
+/* Clickable title styling in the top bar */
+.clickable-title {
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.clickable-title:hover {
+    color: #0088cc;
+    text-decoration: underline;
+}

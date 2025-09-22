@@ -1,0 +1,12 @@
+
+services:
+  jpackage-linux:
+    container_name: jpackage-linux
+    build:
+      context: docker
+      dockerfile: buildLinux.dockerfile
+    volumes:
+      - ./:/app
+    environment:
+      - JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
+    command: make jpackage-linux-client

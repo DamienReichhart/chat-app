@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.Circle?>
+<?import javafx.scene.text.Font?>
+<?import javafx.geometry.Insets?>
+
+<VBox alignment="TOP_CENTER" prefHeight="400.0" prefWidth="350.0" spacing="15"
+      xmlns="http://javafx.com/javafx/21.0.2"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.ap4.client.controllers.ChannelEditController">
+    <padding>
+        <Insets top="20" right="20" bottom="20" left="20"/>
+    </padding>
+    <children>
+        <Label text="Edit Channel" styleClass="title-label">
+            <font>
+                <Font size="24.0"/>
+            </font>
+        </Label>
+        
+        <StackPane>
+            <Circle fx:id="channelAvatar" radius="40" fill="#5dade2"/>
+        </StackPane>
+        
+        <VBox spacing="5">
+            <Label text="Channel Name" styleClass="field-label"/>
+            <TextField fx:id="channelNameField" promptText="Enter channel name"/>
+        </VBox>
+        
+        <VBox spacing="5">
+            <Label text="Description" styleClass="field-label"/>
+            <TextField fx:id="channelDescriptionField" promptText="Enter channel description"/>
+        </VBox>
+        
+        <HBox alignment="CENTER" spacing="10">
+            <Label text="Messages:" styleClass="field-label"/>
+            <Label fx:id="messageCountLabel" text="0"/>
+        </HBox>
+        
+        <Button fx:id="modifyButton" styleClass="primary-button" text="Update Channel Information" prefWidth="200" onAction="#handleModifyButton"/>
+    </children>
+</VBox>
